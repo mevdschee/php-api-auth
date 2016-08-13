@@ -21,4 +21,5 @@
 // if (empty($_SESSION['user'])) exit(403);
 
 // include your api code here:
+// see: https://github.com/mevdschee/php-crud-api
 echo 'Access granted!';
