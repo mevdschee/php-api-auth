@@ -5,7 +5,7 @@
 // for token+session based authentication (see "login_token.html" + "login_token.php"):
 
 // require 'auth.php';
-// $auth = PHP_API_AUTH(array(
+// $auth = new PHP_API_AUTH(array(
 // 	'secret'=>'someVeryLongPassPhrase',
 // ));
 // $auth->executeCommand();
@@ -14,7 +14,7 @@
 // for form+session based authentication (see "login.html"):
 
 // require 'auth.php';
-// $auth = PHP_API_AUTH(array(
+// $auth = new PHP_API_AUTH(array(
 // 	'authenticator'=>function($user,$pass){ if ($user=='admin' && $pass=='admin') $_SESSION['user']=$user; }
 // ));
 // $auth->executeCommand();
