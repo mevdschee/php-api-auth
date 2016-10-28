@@ -1,4 +1,4 @@
-<form method="post" action="api.php">
+<form method="post" action="api.php/">
 <input name="token" value=
 <?php
 require 'auth.php';
