@@ -8,7 +8,7 @@
 // $auth = new PHP_API_AUTH(array(
 // 	'secret'=>'someVeryLongPassPhraseChangeMe',
 // ));
-// $auth->executeCommand();
+// if ($auth->executeCommand()) exit(0);
 // if (empty($_SESSION['user']) || $_GET['csrf']!=$_SESSION['csrf']) {
 //      header('HTTP/1.0 401 Unauthorized');
 //      exit(0);
@@ -20,7 +20,7 @@
 // $auth = new PHP_API_AUTH(array(
 // 	'authenticator'=>function($user,$pass){ if ($user=='admin' && $pass=='admin') $_SESSION['user']=$user; }
 // ));
-// $auth->executeCommand();
+// if ($auth->executeCommand()) exit(0);
 // if (empty($_SESSION['user']) || $_GET['csrf']!=$_SESSION['csrf']) {
 //	header('HTTP/1.0 401 Unauthorized');
 //	exit(0);
