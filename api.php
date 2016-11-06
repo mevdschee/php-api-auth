@@ -6,7 +6,7 @@
 
 // require 'auth.php';
 // $auth = new PHP_API_AUTH(array(
-// 	'secret'=>'someVeryLongPassPhrase',
+// 	'secret'=>'someVeryLongPassPhraseChangeMe',
 // ));
 // $auth->executeCommand();
 // if (empty($_SESSION['user'])) exit(header('HTTP/1.1 403 Access denied'));
@@ -18,7 +18,11 @@
 // 	'authenticator'=>function($user,$pass){ if ($user=='admin' && $pass=='admin') $_SESSION['user']=$user; }
 // ));
 // $auth->executeCommand();
-// if (empty($_SESSION['user'])) exit(header('HTTP/1.1 403 Access denied'));
+
+// if (empty($_SESSION['user']) || $_GET['csrf']!=sha1(session_id())) {
+//	header('HTTP/1.0 401 Unauthorized');
+//	exit(0);
+// }
 
 // include your api code here:
 //
