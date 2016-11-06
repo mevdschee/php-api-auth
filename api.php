@@ -9,7 +9,7 @@
 // 	'secret'=>'someVeryLongPassPhraseChangeMe',
 // ));
 // $auth->executeCommand();
-// if (empty($_SESSION['user']) || $_GET['csrf']!=sha1(session_id())) {
+// if (empty($_SESSION['user']) || $_GET['csrf']!=$_SESSION['csrf']) {
 //      header('HTTP/1.0 401 Unauthorized');
 //      exit(0);
 // }
@@ -21,7 +21,7 @@
 // 	'authenticator'=>function($user,$pass){ if ($user=='admin' && $pass=='admin') $_SESSION['user']=$user; }
 // ));
 // $auth->executeCommand();
-// if (empty($_SESSION['user']) || $_GET['csrf']!=sha1(session_id())) {
+// if (empty($_SESSION['user']) || $_GET['csrf']!=$_SESSION['csrf']) {
 //	header('HTTP/1.0 401 Unauthorized');
 //	exit(0);
 // }
