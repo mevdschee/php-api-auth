@@ -132,7 +132,7 @@ class PHP_API_AUTH {
 		if (!$no_session) {
 			ini_set('session.cookie_httponly', 1);
 			session_start();
-			$_SESSION['csrf'] = rand(0,PHP_INT_MAX);
+			if (!isset($_SESSION['csrf'])) $_SESSION['csrf'] = rand(0,PHP_INT_MAX);
 		}
 		if ($method==$verb && trim($path,'/')==$request) {
 			$input = $this->retrieveInput($post);
@@ -141,6 +141,7 @@ class PHP_API_AUTH {
 				if ($no_session) {
 					echo json_encode($this->generateToken($_SESSION,$time,$ttl,$algorithm,$secret));
 				} else {
+					session_regenerate_id();
 					echo json_encode($_SESSION['csrf']);
 				}
 			} elseif ($secret && isset($input->$token)) {
@@ -149,7 +150,10 @@ class PHP_API_AUTH {
 					foreach ($claims as $key=>$value) {
 						$_SESSION[$key] = $value;
 					}
+					session_regenerate_id();
 					echo json_encode($_SESSION['csrf']);
+				} else if (!$no_session) {
+					session_destroy();
 				}
 			} else {
 				if (!$no_session) {
