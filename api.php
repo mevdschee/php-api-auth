@@ -9,7 +9,10 @@
 // 	'secret'=>'someVeryLongPassPhraseChangeMe',
 // ));
 // $auth->executeCommand();
-// if (empty($_SESSION['user'])) exit(header('HTTP/1.1 403 Access denied'));
+// if (empty($_SESSION['user']) || $_GET['csrf']!=sha1(session_id())) {
+//      header('HTTP/1.0 401 Unauthorized');
+//      exit(0);
+// }
 
 // for form+session based authentication (see "login.html"):
 
@@ -18,7 +21,6 @@
 // 	'authenticator'=>function($user,$pass){ if ($user=='admin' && $pass=='admin') $_SESSION['user']=$user; }
 // ));
 // $auth->executeCommand();
-
 // if (empty($_SESSION['user']) || $_GET['csrf']!=sha1(session_id())) {
 //	header('HTTP/1.0 401 Unauthorized');
 //	exit(0);
