@@ -155,8 +155,6 @@ class PHP_API_AUTH {
 					}
 					session_regenerate_id();
 					echo json_encode($_SESSION['csrf']);
-				} else if (!$no_session) {
-					session_destroy();
 				}
 			} else {
 				if (!$no_session) {
