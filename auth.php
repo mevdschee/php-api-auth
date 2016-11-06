@@ -137,8 +137,10 @@ class PHP_API_AUTH {
 			$input = $this->retrieveInput($post);
 			if ($authenticator && isset($input->$username) && isset($input->$password)) {
 				$authenticator($input->$username,$input->$password);
-				if ($secret) {
+				if ($no_session) {
 					echo json_encode($this->generateToken($_SESSION,$time,$ttl,$algorithm,$secret));
+				} else {
+					echo json_encode(sha1(session_id()));
 				}
 			} elseif ($secret && isset($input->$token)) {
 				$claims = $this->getVerifiedClaims($input->$token,$time,$leeway,$ttl,$algorithm,$secret);
@@ -146,6 +148,7 @@ class PHP_API_AUTH {
 					foreach ($claims as $key=>$value) {
 						$_SESSION[$key] = $value;
 					}
+					echo json_encode(sha1(session_id()));
 				}
 			} else {
 				if (!$no_session) {
