@@ -132,7 +132,10 @@ class PHP_API_AUTH {
 		if (!$no_session) {
 			ini_set('session.cookie_httponly', 1);
 			session_start();
-			if (!isset($_SESSION['csrf'])) $_SESSION['csrf'] = rand(0,PHP_INT_MAX);
+			if (!isset($_SESSION['csrf'])) {
+				if (function_exists('random_int')) $_SESSION['csrf'] = random_int(0,PHP_INT_MAX);
+				else $_SESSION['csrf'] = rand(0,PHP_INT_MAX);
+			}
 		}
 		if ($method==$verb && trim($path,'/')==$request) {
 			$input = $this->retrieveInput($post);
