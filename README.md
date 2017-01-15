@@ -2,6 +2,10 @@
 
 Single file PHP script that adds authentication to a [PHP-CRUD-API](https://github.com/mevdschee/php-crud-api) project.
 
+## Requirements
+
+  - PHP 5.3 or higher
+
 ## Simple username + password
 
 On API server
