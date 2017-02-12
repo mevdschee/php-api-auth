@@ -16,12 +16,15 @@ class PHP_API_AUTH {
 		$method = isset($method)?$method:null;
 		$request = isset($request)?$request:null;
 		$post = isset($post)?$post:null;
+		$origin = isset($origin)?$origin:null;
 		
 		$time = isset($time)?$time:null;
 		$leeway = isset($leeway)?$leeway:null;
 		$ttl = isset($ttl)?$ttl:null;
 		$algorithm = isset($algorithm)?$algorithm:null;
 		$secret = isset($secret)?$secret:null;
+
+		$allow_origin = isset($allow_origin)?$allow_origin:null;
 
 		// defaults
 		if (!$verb) {
@@ -52,7 +55,10 @@ class PHP_API_AUTH {
 		if (!$post) {
 			$post = 'php://input';
 		}
-		
+		if (!$origin) {
+			$origin = isset($_SERVER['HTTP_ORIGIN'])?$_SERVER['HTTP_ORIGIN']:'';
+		}
+
 		if (!$time) {
 			$time = time();
 		}
@@ -66,9 +72,13 @@ class PHP_API_AUTH {
 			$algorithm = 'HS256';
 		}
 
+		if ($allow_origin===null) {
+			$allow_origin = '*';
+		}
+
 		$request = trim($request,'/');
 		
-		$this->settings = compact('verb', 'path', 'username', 'password', 'token', 'authenticator', 'method', 'request', 'post', 'time', 'leeway', 'ttl', 'algorithm', 'secret');
+		$this->settings = compact('verb', 'path', 'username', 'password', 'token', 'authenticator', 'method', 'request', 'post', 'origin', 'time', 'leeway', 'ttl', 'algorithm', 'secret', 'allow_origin');
 	}
 
 
@@ -126,8 +136,39 @@ class PHP_API_AUTH {
 		return $claims;
 	}
 
+	protected function allowOrigin($origin,$allowOrigins) {
+		if ($allowOrigins=='*') {
+			header('Access-Control-Allow-Origin: *');
+		} else {
+			if ($origin) foreach (explode(',',$allowOrigins) as $o) {
+				if (preg_match('/^'.str_replace('\*','.*',preg_quote(strtolower(trim($o)))).'$/',$origin)) { 
+					header('Access-Control-Allow-Origin: '.$origin);
+					break;
+				}
+			}
+		}
+	}
+
+	protected function headersCommand() {
+		$headers = array();
+		$headers[]='Access-Control-Allow-Headers: Content-Type';
+		$headers[]='Access-Control-Allow-Methods: OPTIONS, GET, PUT, POST, DELETE, PATCH';
+		$headers[]='Access-Control-Allow-Credentials: true';
+		$headers[]='Access-Control-Max-Age: 1728000';
+		if (isset($_SERVER['REQUEST_METHOD'])) {
+			foreach ($headers as $header) header($header);
+		} else {
+			echo json_encode($headers);
+		}
+	}
+
 	public function executeCommand() {
 		extract($this->settings);
+		$this->allowOrigin($origin,$allow_origin);
+		if ($method=='OPTIONS') {
+			$this->headersCommand();
+			return true;
+		}
 		$no_session = $authenticator && $secret; 
 		if (!$no_session) {
 			ini_set('session.cookie_httponly', 1);
