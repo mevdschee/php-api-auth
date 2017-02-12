@@ -164,7 +164,9 @@ class PHP_API_AUTH {
 
 	public function executeCommand() {
 		extract($this->settings);
-		header('Access-Control-Allow-Origin: *');
+		if (isset($_SERVER['REQUEST_METHOD'])) {
+			header('Access-Control-Allow-Origin: *');
+		}
 		$this->allowOrigin($origin,$allow_origin);
 		if ($method=='OPTIONS') {
 			$this->headersCommand();
