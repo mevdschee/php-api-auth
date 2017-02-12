@@ -128,6 +128,7 @@ class PHP_API_AUTH {
 
 	public function executeCommand() {
 		extract($this->settings);
+		header('Access-Control-Allow-Origin: *');
 		$no_session = $authenticator && $secret; 
 		if (!$no_session) {
 			ini_set('session.cookie_httponly', 1);
