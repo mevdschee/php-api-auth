@@ -166,6 +166,7 @@ class PHP_API_AUTH {
 		extract($this->settings);
 		if (isset($_SERVER['REQUEST_METHOD'])) {
 			$this->allowOrigin($origin,$allow_origin);
+			header('Access-Control-Allow-Credentials: true');
 		}
 		if ($method=='OPTIONS') {
 			$this->headersCommand();
