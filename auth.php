@@ -137,15 +137,13 @@ class PHP_API_AUTH {
 	}
 
 	protected function allowOrigin($origin,$allowOrigins) {
-		if ($allowOrigins=='*') {
-			header('Access-Control-Allow-Origin: *');
-		} else {
-			if ($origin) foreach (explode(',',$allowOrigins) as $o) {
-				if (preg_match('/^'.str_replace('\*','.*',preg_quote(strtolower(trim($o)))).'$/',$origin)) { 
-					header('Access-Control-Allow-Origin: '.$origin);
-					break;
-				}
+		if ($origin) foreach (explode(',',$allowOrigins) as $o) {
+			if (preg_match('/^'.str_replace('\*','.*',preg_quote(strtolower(trim($o)))).'$/',$origin)) { 
+				header('Access-Control-Allow-Origin: '.$origin);
+				break;
 			}
+		} else {
+			header('Access-Control-Allow-Origin: *');
 		}
 	}
 
