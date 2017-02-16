@@ -149,7 +149,7 @@ class PHP_API_AUTH {
 
 	protected function headersCommand() {
 		$headers = array();
-		$headers[]='Access-Control-Allow-Headers: Content-Type';
+		$headers[]='Access-Control-Allow-Headers: Content-Type, X-XSRF-TOKEN';
 		$headers[]='Access-Control-Allow-Methods: OPTIONS, GET, PUT, POST, DELETE, PATCH';
 		$headers[]='Access-Control-Allow-Credentials: true';
 		$headers[]='Access-Control-Max-Age: 1728000';
@@ -159,6 +159,14 @@ class PHP_API_AUTH {
 			echo json_encode($headers);
 		}
 	}
+
+	public function hasValidCsrfToken() {
+		$csrf = isset($_SESSION['csrf'])?$_SESSION['csrf']:false;
+		if (!$csrf) return false;
+		$get = isset($_GET['csrf'])?$_GET['csrf']:false;
+		$header = isset($_SERVER['HTTP_X_XSRF_TOKEN'])?$_SERVER['HTTP_X_XSRF_TOKEN']:false;
+		return $get == $csrf || $header == $csrf;
+	} 
 
 	public function executeCommand() {
 		extract($this->settings);
@@ -187,6 +195,7 @@ class PHP_API_AUTH {
 					echo json_encode($this->generateToken($_SESSION,$time,$ttl,$algorithm,$secret));
 				} else {
 					session_regenerate_id();
+					setcookie('XSRF-TOKEN',$_SESSION['csrf']);
 					echo json_encode($_SESSION['csrf']);
 				}
 			} elseif ($secret && isset($input->$token)) {
@@ -196,6 +205,7 @@ class PHP_API_AUTH {
 						$_SESSION[$key] = $value;
 					}
 					session_regenerate_id();
+					setcookie('XSRF-TOKEN',$_SESSION['csrf']);
 					echo json_encode($_SESSION['csrf']);
 				}
 			} else {
