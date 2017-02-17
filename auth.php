@@ -165,7 +165,7 @@ class PHP_API_AUTH {
 		if (!$csrf) return false;
 		$get = isset($_GET['csrf'])?$_GET['csrf']:false;
 		$header = isset($_SERVER['HTTP_X_XSRF_TOKEN'])?$_SERVER['HTTP_X_XSRF_TOKEN']:false;
-		return $get == $csrf || $header == $csrf;
+		return ($get == $csrf) || ($header == $csrf);
 	} 
 
 	public function executeCommand() {
@@ -183,8 +183,8 @@ class PHP_API_AUTH {
 			ini_set('session.cookie_httponly', 1);
 			session_start();
 			if (!isset($_SESSION['csrf'])) {
-				if (function_exists('random_int')) $_SESSION['csrf'] = random_int(0,PHP_INT_MAX);
-				else $_SESSION['csrf'] = rand(0,PHP_INT_MAX);
+				if (function_exists('random_int')) $_SESSION['csrf'] = (string)random_int(0,PHP_INT_MAX);
+				else $_SESSION['csrf'] = (string)rand(0,PHP_INT_MAX);
 			}
 		}
 		if ($method==$verb && trim($path,'/')==$request) {
@@ -195,7 +195,7 @@ class PHP_API_AUTH {
 					echo json_encode($this->generateToken($_SESSION,$time,$ttl,$algorithm,$secret));
 				} else {
 					session_regenerate_id();
-					setcookie('XSRF-TOKEN',$_SESSION['csrf']);
+					setcookie('XSRF-TOKEN',$_SESSION['csrf'],0,'/');
 					echo json_encode($_SESSION['csrf']);
 				}
 			} elseif ($secret && isset($input->$token)) {
@@ -205,7 +205,7 @@ class PHP_API_AUTH {
 						$_SESSION[$key] = $value;
 					}
 					session_regenerate_id();
-					setcookie('XSRF-TOKEN',$_SESSION['csrf']);
+					setcookie('XSRF-TOKEN',$_SESSION['csrf'],0,'/');
 					echo json_encode($_SESSION['csrf']);
 				}
 			} else {
