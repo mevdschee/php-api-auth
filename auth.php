@@ -149,7 +149,7 @@ class PHP_API_AUTH {
 
 	protected function headersCommand() {
 		$headers = array();
-		$headers[]='Access-Control-Allow-Headers: Content-Type, X-XSRF-TOKEN';
+		$headers[]='Access-Control-Allow-Headers: Content-Type, X-XSRF-Token';
 		$headers[]='Access-Control-Allow-Methods: OPTIONS, GET, PUT, POST, DELETE, PATCH';
 		$headers[]='Access-Control-Allow-Credentials: true';
 		$headers[]='Access-Control-Max-Age: 1728000';
