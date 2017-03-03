@@ -183,10 +183,8 @@ class PHP_API_AUTH {
 			ini_set('session.cookie_httponly', 1);
 			session_start();
 			if (!isset($_SESSION['csrf'])) {
-				$jsMax = 9007199254740992; // largest nr in JS
-				$max = (PHP_INT_MAX > $jsMax) ? $jsMax : PHP_INT_MAX ;
-				if (function_exists('random_int')) $_SESSION['csrf'] = (string)random_int(0, $max);
-				else $_SESSION['csrf'] = (string)rand(0, $max);
+				if (function_exists('random_int')) $_SESSION['csrf'] = 'N'.random_int(0,PHP_INT_MAX);
+				else $_SESSION['csrf'] = 'N'.rand(0,PHP_INT_MAX);
 			}
 		}
 		if ($method==$verb && trim($path,'/')==$request) {
