@@ -183,8 +183,8 @@ class PHP_API_AUTH {
 			ini_set('session.cookie_httponly', 1);
 			session_start();
 			if (!isset($_SESSION['csrf'])) {
-				if (function_exists('random_int')) $_SESSION['csrf'] = (string)random_int(0,PHP_INT_MAX);
-				else $_SESSION['csrf'] = (string)rand(0,PHP_INT_MAX);
+				if (function_exists('random_int')) $_SESSION['csrf'] = 'N'.random_int(0,PHP_INT_MAX);
+				else $_SESSION['csrf'] = 'N'.rand(0,PHP_INT_MAX);
 			}
 		}
 		if ($method==$verb && trim($path,'/')==$request) {
