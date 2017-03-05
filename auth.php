@@ -197,7 +197,7 @@ class PHP_API_AUTH {
 				} else {
 					session_regenerate_id();
 					setcookie('XSRF-TOKEN',$_SESSION['csrf'],0,'/');
-					header('X-XSRF-Token: ',$_SESSION['csrf']);
+					header('X-XSRF-Token: '.$_SESSION['csrf']);
 					echo json_encode($_SESSION['csrf']);
 				}
 			} elseif ($secret && isset($input->$token)) {
@@ -208,7 +208,7 @@ class PHP_API_AUTH {
 					}
 					session_regenerate_id();
 					setcookie('XSRF-TOKEN',$_SESSION['csrf'],0,'/');
-					header('X-XSRF-Token: ',$_SESSION['csrf']);
+					header('X-XSRF-Token: '.$_SESSION['csrf']);
 					echo json_encode($_SESSION['csrf']);
 				}
 			} else {
