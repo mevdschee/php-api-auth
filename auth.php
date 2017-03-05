@@ -137,13 +137,15 @@ class PHP_API_AUTH {
 	}
 
 	protected function allowOrigin($origin,$allowOrigins) {
-		if ($origin) foreach (explode(',',$allowOrigins) as $o) {
-			if (preg_match('/^'.str_replace('\*','.*',preg_quote(strtolower(trim($o)))).'$/',$origin)) { 
-				header('Access-Control-Allow-Origin: '.$origin);
-				break;
+		if (isset($_SERVER['REQUEST_METHOD'])) {
+			header('Access-Control-Allow-Credentials: true');
+			header('Access-Control-Expose-Headers: X-XSRF-Token');
+			foreach (explode(',',$allowOrigins) as $o) {
+				if (preg_match('/^'.str_replace('\*','.*',preg_quote(strtolower(trim($o)))).'$/',$origin)) { 
+					header('Access-Control-Allow-Origin: '.$origin);
+					break;
+				}
 			}
-		} else {
-			header('Access-Control-Allow-Origin: *');
 		}
 	}
 
@@ -170,9 +172,8 @@ class PHP_API_AUTH {
 
 	public function executeCommand() {
 		extract($this->settings);
-		if (isset($_SERVER['REQUEST_METHOD'])) {
+		if ($origin) {
 			$this->allowOrigin($origin,$allow_origin);
-			header('Access-Control-Allow-Credentials: true');
 		}
 		if ($method=='OPTIONS') {
 			$this->headersCommand();
@@ -196,6 +197,7 @@ class PHP_API_AUTH {
 				} else {
 					session_regenerate_id();
 					setcookie('XSRF-TOKEN',$_SESSION['csrf'],0,'/');
+					header('X-XSRF-Token: ',$_SESSION['csrf']);
 					echo json_encode($_SESSION['csrf']);
 				}
 			} elseif ($secret && isset($input->$token)) {
@@ -206,6 +208,7 @@ class PHP_API_AUTH {
 					}
 					session_regenerate_id();
 					setcookie('XSRF-TOKEN',$_SESSION['csrf'],0,'/');
+					header('X-XSRF-Token: ',$_SESSION['csrf']);
 					echo json_encode($_SESSION['csrf']);
 				}
 			} else {
