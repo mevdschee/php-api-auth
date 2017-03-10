@@ -26,6 +26,8 @@ class PHP_API_AUTH {
 
 		$allow_origin = isset($allow_origin)?$allow_origin:null;
 
+		$security = isset($security)?$security:null;
+
 		// defaults
 		if (!$verb) {
 			$verb = 'POST';
@@ -78,9 +80,8 @@ class PHP_API_AUTH {
 
 		$request = trim($request,'/');
 		
-		$this->settings = compact('verb', 'path', 'username', 'password', 'token', 'authenticator', 'method', 'request', 'post', 'origin', 'time', 'leeway', 'ttl', 'algorithm', 'secret', 'allow_origin');
+		$this->settings = compact('verb', 'path', 'username', 'password', 'token', 'authenticator', 'method', 'request', 'post', 'origin', 'time', 'leeway', 'ttl', 'algorithm', 'secret', 'allow_origin', 'security');
 	}
-
 
 	protected function retrieveInput($post) {
 		$input = (object)array();
@@ -150,15 +151,50 @@ class PHP_API_AUTH {
 	}
 
 	protected function headersCommand() {
+		extract($this->settings);
 		$headers = array();
-		$headers[]='Access-Control-Allow-Headers: Content-Type, X-XSRF-TOKEN';
-		$headers[]='Access-Control-Allow-Methods: OPTIONS, GET, PUT, POST, DELETE, PATCH';
-		$headers[]='Access-Control-Allow-Credentials: true';
-		$headers[]='Access-Control-Max-Age: 1728000';
+		$accessControl = 'Access-Control-Allow-Headers: Content-Type, X-XSRF-TOKEN, Accept';
+		if ($origin) {
+			$accessControl .= ', Origin, X-Requested-With';
+		}
+		if ($security) {
+			$secDefNames = array_keys($this->settings['security']);
+                        foreach ($secDefNames as $secDefName) {
+				$secName = $this->settings['security'][$secDefName]['name'];
+				$accessControl .= ', ' . $secName;
+			}
+		}
+		$headers[] = $accessControl;
+		$headers[] = 'Access-Control-Allow-Methods: OPTIONS, GET, PUT, POST, DELETE, PATCH';
+		$headers[] = 'Access-Control-Allow-Credentials: true';
+		$headers[] = 'Access-Control-Max-Age: 1728000';
 		if (isset($_SERVER['REQUEST_METHOD'])) {
 			foreach ($headers as $header) header($header);
 		} else {
 			echo json_encode($headers);
+		}
+	}
+
+	public function swagger() {
+		extract($this->settings);
+		if ($this->settings['security']) {
+			$secDefs = array('securityDefinitions'=>array());
+			$defs = array('security'=>array());
+			$secDefNames = array_keys($this->settings['security']);
+			foreach ($secDefNames as $secDefName) {
+				$secType = $this->settings['security'][$secDefName]['type'];
+				switch ($secType) {
+					case "apiKey":
+						$secDefs['securityDefinitions'][$secDefName]['type'] = $secType;
+						$secDefs['securityDefinitions'][$secDefName]['name'] = $this->settings['security'][$secDefName]['name'];
+						$secDefs['securityDefinitions'][$secDefName]['in'] = $this->settings['security'][$secDefName]['in'];
+						$def = array($secDefName => array());
+						array_push($defs['security'],$def);
+						break;
+				}
+			}
+			echo '' . substr(json_encode($secDefs,JSON_FORCE_OBJECT),1,-1);
+			echo ',' . substr(json_encode($defs),1,-1) . ',';
 		}
 	}
 
@@ -169,6 +205,36 @@ class PHP_API_AUTH {
 		$header = isset($_SERVER['HTTP_X_XSRF_TOKEN'])?$_SERVER['HTTP_X_XSRF_TOKEN']:false;
 		return ($get == $csrf) || ($header == $csrf);
 	} 
+
+	public function hasValidApiKey() {
+		extract($this->settings);
+		$validKey = false;
+		$secDefNames = array_keys($this->settings['security']);
+		foreach ($secDefNames as $secDefName) {
+			$secType = $this->settings['security'][$secDefName]['type'];
+			$secName = $this->settings['security'][$secDefName]['name'];
+			$secIn   = $this->settings['security'][$secDefName]['in'];
+			$secKeys = $this->settings['security'][$secDefName]['keys'];
+			if ($secType=='apiKey') {
+				switch ($secIn) {
+					case "query":
+						$apikey = isset($_GET[$secName])?$_GET[$secName]:false;
+						if (in_array($apikey,$secKeys)) {
+							$validKey = true;
+						}
+						break;
+					case "header":
+						$headers = apache_request_headers();
+						$apikey = isset($headers[$secName])?$headers[$secName]:false;
+						if (in_array($apikey,$secKeys)) {
+							$validKey = true;
+						}
+						break;
+				}
+			}
+		}
+		return $validKey;
+	}
 
 	public function executeCommand() {
 		extract($this->settings);
