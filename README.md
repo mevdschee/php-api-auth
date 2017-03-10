@@ -32,3 +32,9 @@ On API server
 - sends back csrf token + http-only session cookie
 - call API as: api.php?csrf=\[csrf token] (session cookie is sent automatically)
 - (when using Angular2 or Vue2 the CSRF token is sent automatically)
+
+## With apiKey
+
+- Tested with swagger.io editor under Chrome
+- Both query and header methods are supported
+- See api.php for examples
