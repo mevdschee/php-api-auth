@@ -1,4 +1,4 @@
-# PHP-API-AUTH
+# PHP-API-AUTH (v1)
 
 Single file PHP script that adds authentication to a [PHP-CRUD-API](https://github.com/mevdschee/php-crud-api) project.
 
