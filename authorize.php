@@ -20,14 +20,6 @@ function generateToken($claims, $time, $ttl, $algorithm, $secret)
     return implode('.', $token);
 }
 
-function validate($username, $password)
-{
-    if ($username == 'admin' && $password == 'admin') {
-        return true;
-    }
-    return false;
-}
-
 function redirect($url)
 {
     header('Location: ' . $url, true, 302);
@@ -47,28 +39,60 @@ function generateTokenUrl($claims, $redirectUri)
     $ttl = getConfig('ttl', 5);
     $algorithm = getConfig('algorithm', 'HS256');
     $secret = getConfig('secret', '');
-    $url = $redirectUri . '#' . generateToken($claims, $time, $ttl, $algorithm, $secret);
+    $token = generateToken($claims, $time, $ttl, $algorithm, $secret);
+    $redirects = getConfig('redirects', []);
+    if (!in_array($redirectUri, $redirects)) {
+        return 'login.html#message=invalid_redirect';
+    }
+    return $redirectUri . '#access_token=' . $token;
 }
 
-function handlePost($session, $post, $get)
+function handlePost(&$session, $post, $get)
 {
-    $valid = validate($post['username'], $post['password']);
+    $GLOBALS['client_id'] = $get['client_id'];
+    $GLOBALS['audience'] = $get['audience'];
+    $validate = getConfig('validate', function ($username, $password) {return false;});
+    $valid = call_user_func($validate, $post['username'], $post['password']);
     if ($valid) {
-        $_SESSION['username'] = $post['username'];
-        return generateTokenUrl($_SESSION, $get['redirect_uri']);
+        $session['username'] = $post['username'];
+        return generateTokenUrl($session, $get['redirect_uri']);
     }
+    return 'login.html#message=invalid_password';
 }
 
 function getConfig($key, $default)
 {
-    global $config;
+    $clientId = $GLOBALS['client_id'];
+    $audience = $GLOBALS['audience'];
+    $config = $GLOBALS['config'][$clientId][$audience];
+    die('<pre>' . var_export($clientId, true) . '</pre>');
+    die('<pre>' . var_export($audience, true) . '</pre>');
+    die('<pre>' . var_export($config, true) . '</pre>');
     return isset($config[$key]) ? $config[$key] : $default;
 }
 
-session_start();
-switch ($_SERVER['REQUEST_METHOD']) {
-    case 'GET':
-        redirect(handleGet($_SESSION, $_GET));
-    case 'POST':
-        redirect(handlePost($_SESSION, $_POST, $_GET));
+function main($config)
+{
+    $GLOBALS['config'] = $config;
+    session_start();
+    switch ($_SERVER['REQUEST_METHOD']) {
+        case 'GET':
+            redirect(handleGet($_SESSION, $_GET));
+            break;
+        case 'POST':
+            redirect(handlePost($_SESSION, $_POST, $_GET));
+            break;
+    }
 }
+
+main([
+    'default' => [
+        'http://127.0.0.3/api.php' => [
+            'secret' => 'test',
+            'redirects' => ['http://127.0.0.1/vanilla.html'],
+            'validate' => function ($username, $password) {
+                return $username == 'admin' && $password == 'admin';
+            },
+        ],
+    ],
+]);
