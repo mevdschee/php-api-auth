@@ -2,7 +2,14 @@
 
 function generateToken($subject, $audience, $issuer, $time, $ttl, $algorithm, $secret)
 {
-    $algorithms = array('HS256' => 'sha256', 'HS384' => 'sha384', 'HS512' => 'sha512');
+    $algorithms = array(
+        'HS256' => 'sha256',
+        'HS384' => 'sha384',
+        'HS512' => 'sha512',
+        'RS256' => 'sha256',
+        'RS384' => 'sha384',
+        'RS512' => 'sha512',
+    );
     $header = array();
     $header['typ'] = 'JWT';
     $header['alg'] = $algorithm;
@@ -18,7 +25,15 @@ function generateToken($subject, $audience, $issuer, $time, $ttl, $algorithm, $s
         return false;
     }
     $hmac = $algorithms[$algorithm];
-    $signature = hash_hmac($hmac, "$token[0].$token[1]", $secret, true);
+    $data = "$token[0].$token[1]";
+    switch ($algorithm[0]) {
+        case 'H':
+            $signature = hash_hmac($hmac, $data, $secret, true);
+            break;
+        case 'R':
+            $signature = (openssl_sign($data, $signature, $secret, $hmac) ? $signature : '');
+            break;
+    }
     $token[2] = rtrim(strtr(base64_encode($signature), '+/', '-_'), '=');
     return implode('.', $token);
 }
