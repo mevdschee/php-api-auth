@@ -46,4 +46,5 @@ This is the authentication flow:
 
 Now the client can do API calls until the session times out.
 
-I suggest that you first get this working with [Auth0](https://auth0.com/) before you start implementing your own.
+I suggest that you first get PHP-CRUD-API working with [Auth0](https://auth0.com/) before you start 
+implementing your own JWT based authentication provider using this repository.
