@@ -25,7 +25,7 @@ Upload "`auth.php`" and edit the configuration block at the bottom of the file:
             ],
         ]);
 
-You should change the "secret" and set the "redirects" to the client (see below) that uses the JWT token. The validate function should be changed to hold a stronger password validation.
+You should change the "secret" and set the "redirects" to the URL of the client (for source code see below) that uses the JWT token. The validate function should be changed to hold a stronger password validation.
 
 The default "clientId" is "default" and is the first key in the config. The default "audience" is "api.php" and this is defined as the second key in the config. 
 
