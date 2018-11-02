@@ -32,3 +32,16 @@ The default "clientId" is "default" and is the first key in the config. The defa
 Example client:
 
 https://github.com/mevdschee/php-crud-api/blob/master/examples/clients/auth.php/vanilla.html
+
+## Flow
+
+This is the authentication flow:
+
+- Browser will load the client.
+- The client will redirect the user to the "auth.php" 
+- If the user does not have a valid session (cookie) then the "login.html" page is served.
+- The user is redirected back to the client with the token in the URL
+- The client uses the token to call the api.
+- The API will exchange the token for a session (cookie)
+
+Now the client can do API calls until the session times out.
