@@ -51,7 +51,7 @@ function serve($file)
 function handleGet($config, $session)
 {
     if (empty($session)) {
-        serve('login.html');
+        serve($config['login']);
     } else {
         redirect(generateTokenUrl($config, $session));
     }
@@ -86,7 +86,7 @@ function handlePost($config, &$session, $username, $password)
     $validate = getConfig($config, 'validate', function ($username, $password) {return false;});
     $valid = call_user_func($validate, $username, $password);
     if (!$valid) {
-        serve('login.html');
+        serve($config['login']);
     } else {
         session_regenerate_id();
         $session['username'] = $username;
@@ -139,6 +139,7 @@ main([
     'default' => [
         'api.php' => [
             'secret' => 'someVeryLongPassPhraseChangeMe',
+            'login' => 'login.html',
             'redirects' => 'http://localhost/vanilla.html',
             'validate' => function ($username, $password) {
                 return $username == 'admin' && $password == 'admin';
