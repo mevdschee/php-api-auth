@@ -1,5 +1,68 @@
-<form method="post">
-<input name="username" value="admin"/>
-<input name="password" value="admin"/>
-<input type="submit" value="ok">
-</form>
+<!-- this file should be served from login.example.com -->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Login</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const logout = urlParams.get('logout');
+            const error = urlParams.get('error');
+
+            if (logout) {
+                $.ajax({
+                    url: 'https://api.example.com/authapi.php/logout',
+                    method: 'GET',
+                    success: function (response) {
+                        // Clear any local session data here
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.error('Error: ' + textStatus, errorThrown);
+                    }
+                });
+            }
+
+            if (error) {
+                $('#error-message').text(error);
+            }
+            $('#login-form').submit(function (event) {
+                event.preventDefault();
+                var username = $('#username').val();
+                var password = $('#password').val();
+                $.ajax({
+                    url: 'https://api.example.com/auth.php?audience=example&client_id=example&redirect_uri=https://app.example.com/',
+                    method: 'POST',
+                    data: {
+                        username: username,
+                        password: password
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <h1>Login</h1>
+    <form id="login-form">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username"><br><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password"><br><br>
+        <input type="submit" value="Login">
+    </form>
+    <p id="error-message"></p>
+</body>
+
+</html>
+
+
+authUrl: "https://jwt.devel.tourismapp.it/",
+auth: {
+seg1: 'https://jwt.devel.tourismapp.it?audience=',
+seg2: '&response_type=token&client_id=',
+seg3: '&redirect_uri=https://',
+seg4: '.tourismapp.it/'
+},
