@@ -1,5 +1,5 @@
 <?php
-
+//this file should be served from https://api.example.com/auth.php
 function generateToken($subject, $user, $audience, $issuer, $time, $ttl, $algorithm, $secret)
 {
     $algorithms = array(
@@ -55,7 +55,7 @@ function handleGet($config, $session, $logout, $error)
     if ($error) {
         redirect($config['loginError']); // redirect (instead of serving an html page) to login application with error parameter set to=1 in case of failed login (used to display error message)
     }
-    if (empty($session) || $logout ) {
+    if (empty($session) || $logout) {
         redirect($config['login']); // redirect (instead of serving an html page) to login application in case of missing token
     } else {
         redirect(generateTokenUrl($config, $session));
@@ -69,7 +69,7 @@ function getSecure()
 
 function getHost() // get host name, used to set the instance server name as issuer
 {
-    return $_SERVER['HTTP_HOST']; 
+    return $_SERVER['HTTP_HOST'];
 }
 
 function getFullUrl()
@@ -184,7 +184,7 @@ main([
             'loginError' => 'https://login.example2.com?error=1', // redirection to login application with error parameter set to=1 in case of failed login (used to display error message)
             'redirects' => 'https://app.example2.com', // redirects to application in case of successful login
             'validate' => function ($username, $password) { // validation of static username and password, with fixed payload
-                $valid = $username == 'company_admin_account' && $password == 'password'; 
+                $valid = $username == 'company_admin_account' && $password == 'password';
                 $response = array(
                     'success' => ($valid == true),
                     'payload' => json_decode('{
@@ -204,7 +204,7 @@ main([
             'loginError' => 'https://login.devel.example1.com?error=1', // redirection to login application with error parameter set to=1 in case of failed login (used to display error message)
             'redirects' => 'http://localhost:8080/', // redirects to localhost development environment
             'validate' => function ($username, $password) { // validation of static username and password, with fixed payload
-                $valid = $username == 'developer1' && $password == 'password'; 
+                $valid = $username == 'developer1' && $password == 'password';
                 $response = array(
                     'success' => ($valid == true),
                     'payload' => json_decode('{
@@ -215,14 +215,14 @@ main([
                 );
                 return $response;
             }
-        ], 
+        ],
         'developer2' => [ // audience2 - developer2
             'secret' => 'someVeryLongPassPhraseChangeMe',
             'login' => 'https://login.devel.example2.com/', // redirection to login application in case of missing token
             'loginError' => 'https://login.devel.example2.com?error=1', // redirection to login application with error parameter set to=1 in case of failed login (used to display error message)
             'redirects' => 'http://localhost:8081/', // redirects to application in case of successful login
             'validate' => function ($username, $password) { // validation of static username and password, with fixed payload
-                $valid = $username == 'developer2' && $password == 'password'; 
+                $valid = $username == 'developer2' && $password == 'password';
                 $response = array(
                     'success' => ($valid == true),
                     'payload' => json_decode('{

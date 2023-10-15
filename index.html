@@ -1,0 +1,31 @@
+<!-- this file should be served from https://app.example.com -->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>JWT EXAMPLE APP</title>
+</head>
+
+<body>
+    <script>
+        var xhr = new XMLHttpRequest();
+        xAuth = xhr.getResponseHeader('X-Authorization');
+
+        var token = xAuth.split(' ')[1];
+
+        if (!token) {
+            window.location.href = 'https://api.example.com/auth.php?audience=example&client_id=example&redirect_uri=https://app.example.com/';
+        }
+
+        // Logout button
+        var logoutBtn = document.createElement('button');
+        logoutBtn.innerHTML = 'Logout';
+        logoutBtn.onclick = function () {
+            window.location.href = 'https://login.example.com?logout=1';
+        };
+        document.body.appendChild(logoutBtn);
+
+    </script>
+</body>
+
+</html>
